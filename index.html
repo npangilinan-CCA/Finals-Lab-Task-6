@@ -1,0 +1,876 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finals Lab Task 1 - Creating a Database using MySQL Workbench</title>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Cursor */
+        * {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7,2 L17,12 L7,22 L7,2" fill="silver" stroke="white" stroke-width="1"/><text x="14" y="14" fill="white" font-size="8">♱</text></svg>') 7 12, auto;
+        }
+
+        /* Hover Cursor */
+        a:hover, button:hover, .logo:hover, .frame-corner:hover, ul li:hover {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7,2 L17,12 L7,22 L7,2" fill="white" stroke="silver" stroke-width="1"/><text x="14" y="14" fill="silver" font-size="8">♱</text></svg>') 7 12, pointer;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, #000, #111);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #333, #666);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #444, #777);
+        }
+
+        :root {
+            --chrome-black: #000000;
+            --chrome-silver: #C0C0C0;
+            --chrome-white: #FFFFFF;
+            --cross-pink: #FFB6C1;
+            --cross-blue: #4169E1;
+            --cross-yellow: #FFD700;
+            --cross-red: #FF0000;
+            --cross-green: #00FF00;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem;
+            font-family: 'Playfair Display', serif;
+            color: white;
+            background: black;
+            line-height: 1.6;
+            font-size: 18px;
+            overflow-x: hidden;
+        }
+
+       /* Enhanced Title Styles */
+        .title-container {
+            position: relative;
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+        }
+
+        .main-title {
+            position: relative;
+            display: inline-block;
+            font-family: 'UnifrakturCook', cursive;
+            font-size: 3rem !important;
+            background: linear-gradient(45deg, #c0c0c0, #ffffff, #808080) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            transition: all 0.3s ease;
+            padding: 1rem !important;
+            margin: 0 !important;
+            cursor: pointer;
+        }
+
+        .main-title::before,
+        .main-title::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent,
+                #FFB6C1, #4169E1, #FFD700, #FF0000, #00FF00,
+                transparent
+            );
+            transition: width 0.5s ease;
+        }
+
+        .main-title::before {
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .main-title::after {
+            right: 50%;
+            bottom: 0;
+            transform: translateX(50%);
+        }
+
+        .title-container:hover .main-title::before,
+        .title-container:hover .main-title::after {
+            width: 100%;
+        }
+
+        .title-container:hover .main-title {
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 30px rgba(255, 255, 255, 0.1);
+            letter-spacing: 2px;
+            transform: scale(1.05);
+        }
+
+        .title-container::before,
+        .title-container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 2px;
+            height: 0;
+            background: linear-gradient(to bottom,
+                transparent,
+                var(--chrome-silver),
+                transparent
+            );
+            transition: height 0.3s ease;
+        }
+
+        .title-container::before {
+            left: 0;
+        }
+
+        .title-container::after {
+            right: 0;
+        }
+
+        .title-container:hover::before,
+        .title-container:hover::after {
+            height: 80%;
+            transform: translateY(-50%);
+        }
+        
+                /* Loading Screen Styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-content {
+            text-align: center;
+            position: relative;
+        }
+
+        .loading-content::before,
+        .loading-content::after {
+            content: '♱';
+            position: absolute;
+            font-size: 2rem;
+            color: var(--chrome-silver);
+            animation: rotateCross 4s linear infinite;
+        }
+
+        .loading-content::before {
+            left: -50px;
+            animation-delay: -2s;
+        }
+
+        .loading-content::after {
+            right: -50px;
+            animation-delay: -1s;
+        }
+
+        .loading-logo {
+            font-family: 'UnifrakturCook', cursive;
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, 
+                #e0e0e0, #aaa, #f5f5f5, #888,
+                #e0e0e0, #aaa, #f5f5f5, #888
+            );
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: loadingColorCycle 3s infinite;
+            text-shadow: 
+                0 0 20px rgba(255,255,255,0.2),
+                0 0 40px rgba(255,255,255,0.1);
+        }
+
+        .loading-cross {
+            font-size: 3rem;
+            margin: 2rem 0;
+            animation: loadingSpin 2s infinite linear;
+            color: var(--chrome-silver);
+            text-shadow: 0 0 10px var(--chrome-silver);
+        }
+
+        .loading-bar-container {
+            width: 300px;
+            height: 3px;
+            background: rgba(192, 192, 192, 0.1);
+            margin: 2rem auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .loading-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(
+                90deg,
+                var(--chrome-silver),
+                var(--chrome-white),
+                var(--chrome-silver)
+            );
+            animation: loadingProgress 2s ease-out forwards;
+            box-shadow: 0 0 15px var(--chrome-silver);
+        }
+
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            color: var(--chrome-silver);
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            margin-top: 1rem;
+            opacity: 0.8;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Enhanced Process List Styles */
+        .process-list {
+            list-style: none;
+            padding: 0;
+            font-size: 1.2rem;
+        }
+
+        .process-list > li {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            border: 1px solid rgba(192, 192, 192, 0.1);
+        }
+
+        .process-list > li::before {
+            content: '♱';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--chrome-silver);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .process-list > li:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(20px) scale(1.02);
+            border-color: var(--chrome-silver);
+            box-shadow: 
+                0 0 10px rgba(192, 192, 192, 0.2),
+                0 0 20px rgba(192, 192, 192, 0.1);
+        }
+
+        .process-list > li:hover::before {
+            opacity: 1;
+            left: 10px;
+        }
+
+        .sub-list {
+            list-style: none;
+            padding-left: 2rem;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .sub-list li {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+            position: relative;
+            border-left: 2px solid transparent;
+        }
+
+        .sub-list li:hover {
+            border-left-color: var(--chrome-silver);
+            padding-left: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Description Styles */
+        .description {
+            color: var(--chrome-white);
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin: 2rem 0;
+            text-align: justify;
+            padding: 0 1rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Section Title Styles */
+        .section-title {
+            font-family: 'UnifrakturCook', cursive;
+            font-size: 2.4rem;
+            color: var(--chrome-white);
+            text-shadow: 
+                0 0 10px rgba(255,255,255,0.2),
+                0 0 20px rgba(255,255,255,0.1);
+            margin: 3rem 0 2rem;
+            border-bottom: 2px solid var(--chrome-silver);
+            padding-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-title:hover {
+            transform: scale(1.02);
+            border-bottom-width: 3px;
+            text-shadow: 
+                0 0 15px rgba(255,255,255,0.3),
+                0 0 30px rgba(255,255,255,0.2);
+        }
+                /* Image Container Styles */
+        .image-container {
+            margin: 3rem auto;
+            position: relative;
+            max-width: 600px;
+            width: 95%;
+        }
+
+        .image-container.dashboard-image {
+            max-width: 800px;
+        }
+
+        .image-title {
+            font-family: 'UnifrakturCook', cursive;
+            font-size: 2rem;
+            color: var(--chrome-silver);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .chrome-frame {
+            position: relative;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--chrome-silver);
+            transition: all 0.4s ease;
+            max-width: 100%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .chrome-frame:hover {
+            transform: scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(192, 192, 192, 0.2),
+                0 0 60px rgba(192, 192, 192, 0.1);
+        }
+
+        .chrome-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s ease;
+        }
+
+        .chrome-frame:hover img {
+            border-color: var(--chrome-silver);
+        }
+
+        /* Frame Corner Styles */
+        .frame-corner {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border: 2px solid var(--chrome-silver);
+            transition: all 0.3s ease;
+        }
+
+        .top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+
+        .bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        .chrome-frame:hover .frame-corner {
+            width: 30px;
+            height: 30px;
+            border-color: var(--chrome-white);
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border: 2px solid var(--chrome-silver);
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.3);
+            position: relative;
+            backdrop-filter: blur(5px);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .container.loaded {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes rotateCross {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes loadingSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loadingColorCycle {
+            0% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+            50% { background-position: 100% 50%; filter: hue-rotate(180deg); }
+            100% { background-position: 0% 50%; filter: hue-rotate(360deg); }
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Floating Colored Crosses */
+        .colored-cross {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 20s linear infinite;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">Finals Lab Task 1</div>
+            <div class="loading-cross">♱</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-text">LOADING...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="title-container">
+            <div class="main-title">Finals Lab Task 6 - MongoDBCRUD</div>
+        </div>
+                <p class="description">
+            This task focuses on performing fundamental MongoDB operations such as creating a database, inserting documents, and executing find, update, search, and delete actions within a collection.
+        </p>
+
+        <h2 class="section-title">Step by Step Process</h2>
+        <ol class="process-list">
+            <li>
+                Create a Database
+                <ul class="sub-list">
+                    <li>Start by creating or switching to a specific database</li>
+                    <li>The selected database becomes the active workspace for all upcoming operations</li>
+                </ul>
+            </li>
+            <li>
+                Insert Documents
+                <ul class="sub-list">
+                    <li>Within the database, a collection is created</li>
+                    <li>Multiple documents are inserted into the collection, each containing structured data fields such as name, age, or address</li>
+                </ul>
+            </li>
+            <li>
+                FIND Documents
+                <ul class="sub-list">
+                    <li>Display all documents stored in the collection</li>
+                    <li>Use filters to find specific documents based on certain values like name or ID</li>
+                </ul>
+            </li>
+            <li>
+                UPDATE Documents
+                <ul class="sub-list">
+                    <li>Locate the document that needs modification using a condition (e.g., name or ID)</li>
+                    <li>Specify the field(s) to be changed and apply the update</li>
+                    <li>Confirm the update by checking the document again</li>
+                </ul>
+            </li>
+            <li>
+                SEARCH Documents
+                <ul class="sub-list">
+                    <li>Use specific criteria to locate documents that match particular conditions (e.g., age greater than a value or status equals a specific string)</li>
+                    <li>Review the matched results for accuracy</li>
+                </ul>
+            </li>
+            <li>
+                DELETE Documents
+                <ul class="sub-list">
+                    <li>Identify the document(s) to be removed using a condition</li>
+                    <li>Remove the document(s) from the collection</li>
+                    <li>Verify deletion by checking the collection contents</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2 class="section-title">Queries</h2>
+        
+        <h3 class="image-title">Create Database</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/b56c32d2-ad0c-4704-a811-fb05223afa46" alt="Query 1">
+            </div>
+        </div>
+
+        <!-- Repeat similar structure for Tasks 2-5 -->
+        <h3 class="image-title">Insert Documents</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/e99acd48-dea8-4c0b-ac5f-1147d2e4be7a" alt="Query 2">
+                <img src="https://github.com/user-attachments/assets/cdf30409-f378-49b4-9c29-f4d725223c76" alt="Query 3">
+                <img src="https://github.com/user-attachments/assets/eec76cd8-508a-425f-8a30-927c0b73a549" alt="Query 4">
+                <img src="https://github.com/user-attachments/assets/1dd84f52-af1c-47b2-b1fa-c0ba1a25053f" alt="Query 5">
+            </div>
+        </div>
+
+        <h3 class="image-title">get all documents</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/a46973ab-d652-4e0f-a2e3-8fb656fd277e" alt="Query 6">
+                <img src="https://github.com/user-attachments/assets/5b6f52fe-ea80-4d63-b1be-96468e3ab664" alt="Query 7">
+                <img src="https://github.com/user-attachments/assets/bbe789d8-b7a4-4891-8268-61324133847f" alt="Query 8">
+            </div>
+        </div>
+
+        <h3 class="image-title">get all documents with `writer` set to "Quentin Tarantino"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/70f2851f-e672-4ce5-b5ca-261fa7ee5853" alt="Query 9">
+            </div>
+        </div>
+
+        <h3 class="image-title">get all documents where `actors` include "Brad Pitt"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/ef12a9b6-2eac-4319-a181-1572514a3488" alt="Query 10">
+            </div>
+        </div>
+        
+        <h3 class="image-title">get all documents with `franchise` set to "The Hobbit"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/e72ce0f9-8e8a-490c-b2c1-33848c7ae781" alt="Query 11">
+            </div>
+        </div>
+        
+        <h3 class="image-title">get all movies released in the 90s</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/749a5512-cd0f-40ed-a02a-929c7f500aec" alt="Query 12">
+            </div>
+        </div>
+        
+        <h3 class="image-title">get all movies released before the year 2000 or after 2010</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/7296b07e-ead9-410d-b7f8-ef03ec2f78aa" alt="Query 13">
+            </div>
+        </div>
+        
+        <h3 class="image-title">add a synopsis to "The Hobbit: An Unexpected Journey"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/bd7ba3aa-5584-49ed-bac6-4a87b405545f" alt="Query 14">
+            </div>
+        </div>
+        
+        <h3 class="image-title">add a synopsis to "The Hobbit: The Desolation of Smaug"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/e86e56e2-1ca1-4823-8423-8e78d740b79d" alt="Query 15">
+            </div>
+        </div>
+        
+        <h3 class="image-title">find all movies that have a synopsis that contains the word "Bilbo"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/445865ba-36cf-407e-9abe-eb0f4acde048" alt="Query 16">
+            </div>
+        </div>
+        
+        <h3 class="image-title">find all movies that have a synopsis that contains the word "Gandalf"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/27e92f5a-5063-4255-ae00-d28977b10e27" alt="Query 18">
+            </div>
+        </div>
+        
+        <h3 class="image-title">find all movies that have a synopsis that contains the word "Bilbo" and not the word "Gandalf"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/79f28fb8-152a-41e4-a59d-f429f0bb0096" alt="Query 19">
+            </div>
+        </div>
+        
+        <h3 class="image-title">find all movies that have a synopsis that contains the word "dwarves" or "hobbit"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/bce60dcb-18bf-4666-8375-b1b3e2caed6e" alt="Query 20">
+            </div>
+        </div>
+        
+        <h3 class="image-title">find all movies that have a synopsis that contains the word "gold" and "dragon"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/735d2e46-2b78-4efe-9fb9-e1ca7247a84d" alt="Query 21">
+            </div>
+        </div>
+        
+         <h3 class="image-title">delete the movie "Pee Wee Herman's Big Adventure"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/05d4eb12-a82a-4c73-b28c-19b0c507b3d5" alt="Query 22">
+            </div>
+        </div>
+        
+        <h3 class="image-title">delete the movie "Avatar"</h3>
+        <div class="image-container">
+            <div class="chrome-frame">
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+                <img src="https://github.com/user-attachments/assets/c50bd760-6fd3-4749-b342-78c7021d1627" alt="Query 23">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const container = document.querySelector('.container');
+            
+            // Enhanced Loading sequence
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                container.classList.add('loaded');
+                
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                }, 500);
+            }, 2000);
+
+           // Title interaction effect
+        document.querySelector('.main-title').addEventListener('mousemove', (e) => {
+            const title = e.target;
+            const rect = title.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const angleX = (y - centerY) / 10;
+            const angleY = (centerX - x) / 10;
+            
+            title.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.05)`;
+        });
+
+        document.querySelector('.main-title').addEventListener('mouseleave', (e) => {
+            e.target.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+
+            // Enhanced floating crosses
+            function createColoredCross() {
+                const colors = ['#FFB6C1', '#4169E1', '#FFD700', '#FF0000', '#00FF00'];
+                const cross = document.createElement('div');
+                cross.className = 'colored-cross';
+                cross.innerHTML = '♱';
+                cross.style.left = Math.random() * 100 + 'vw';
+                cross.style.color = colors[Math.floor(Math.random() * colors.length)];
+                cross.style.animationDuration = (15 + Math.random() * 10) + 's';
+                document.body.appendChild(cross);
+
+                setTimeout(() => {
+                    cross.remove();
+                }, 20000);
+            }
+
+            // Create initial crosses
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => createColoredCross(), i * 200);
+            }
+
+            // Add new crosses periodically
+            setInterval(createColoredCross, 2000);
+
+            // Enhanced image hover effects
+            document.querySelectorAll('.chrome-frame').forEach(frame => {
+                frame.addEventListener('mouseenter', () => {
+                    frame.style.transform = 'scale(1.02) translateY(-5px)';
+                    frame.style.boxShadow = `
+                        0 10px 20px rgba(0,0,0,0.2),
+                        0 0 30px rgba(192,192,192,0.3),
+                        0 0 50px rgba(65,105,225,0.2)
+                    `;
+                });
+                
+                frame.addEventListener('mouseleave', () => {
+                    frame.style.transform = 'scale(1) translateY(0)';
+                    frame.style.boxShadow = 'none';
+                });
+            });
+
+            // Add hover effect to list items
+            document.querySelectorAll('.process-list > li').forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(20px) scale(1.02)';
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
