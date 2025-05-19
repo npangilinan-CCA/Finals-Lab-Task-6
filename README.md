@@ -100,7 +100,43 @@ This task focuses on performing fundamental MongoDB operations such as creating 
 ## delete the movie "Avatar"
 ![image](https://github.com/user-attachments/assets/c50bd760-6fd3-4749-b342-78c7021d1627)
 
+## Insert the following documents into a 'users' collection
+![image](https://github.com/user-attachments/assets/3a3d7a44-ae53-4812-80c4-0454e4b650dd)
 
+## Insert the following documents into a 'posts' collecton
+![image](https://github.com/user-attachments/assets/d83109d2-e938-4741-861e-45bc8d69664f)
+
+## Insert the following documents into a 'comments' collection
+![image](https://github.com/user-attachments/assets/c6103663-1226-4601-ac6a-e361be5eab06)
+
+## find all users
+![image](https://github.com/user-attachments/assets/69cd9278-8231-4a05-a191-6be3461e726e)
+
+## find all posts
+![image](https://github.com/user-attachments/assets/5fc1539a-c84f-4693-ba13-78f1b11bdbef)
+![image](https://github.com/user-attachments/assets/16106ec1-d2bf-4468-bc2c-93d7154910d6)
+
+## find all posts that was authored by "GoodGuyGreg"
+![image](https://github.com/user-attachments/assets/2523cf87-4556-4fd1-97ae-4254fb2f786e)
+
+## find all posts that was authored by "ScumbagSteve"
+![image](https://github.com/user-attachments/assets/7419cd0e-c45f-495b-81fd-541088406c93)
+
+## find all comments
+![image](https://github.com/user-attachments/assets/d65f5bdc-ecdb-4e2f-afbd-ad56c959e570)
+![image](https://github.com/user-attachments/assets/9d3e5b8c-309c-4b33-a570-370aa925b7bf)
+
+## find all comments that was authored by "GoodGuyGreg"
+![image](https://github.com/user-attachments/assets/326b0a86-319d-4fa4-a98b-9a8a0c6c2146)
+
+## find all comments that was authored by "ScumbagSteve"
+![image](https://github.com/user-attachments/assets/e7198777-2e45-4354-98a1-b3e55faea105)
+
+## find all comments belonging to the post "Reports a bug in your code"
+![image](https://github.com/user-attachments/assets/5430ff35-e663-431f-898c-121fc552ee47)
+
+## ER Diagram
+![image](https://github.com/user-attachments/assets/0bce4b7a-3217-416a-b8ab-5b0f6c06c1e1)
 
 
 
